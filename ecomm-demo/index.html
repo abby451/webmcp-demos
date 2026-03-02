@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop T-Shirts | Thread</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f9f8f5;
+      --surface:   #ffffff;
+      --border:    #e8e5de;
+      --text:      #1c1b18;
+      --muted:     #918f88;
+      --accent:    #1c1b18;
+      --tag-bg:    #f0efe9;
+      --radius:    8px;
+      --shadow:    0 2px 16px rgba(0,0,0,0.07);
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    nav a {
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-decoration: none;
+      margin-left: 24px;
+      letter-spacing: 0.03em;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--text); }
+    nav a.active { color: var(--text); font-weight: 500; }
+
+    /* ── Basket button ── */
+    .basket-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 100px;
+      padding: 8px 16px 8px 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      position: relative;
+    }
+    .basket-btn:hover { opacity: 0.8; }
+
+    .basket-count {
+      background: #fff;
+      color: var(--accent);
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      min-width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      transition: transform 0.2s;
+    }
+
+    .basket-count.bump {
+      animation: countBump 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes countBump {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.4); }
+      100% { transform: scale(1); }
+    }
+
+    /* ── Page hero ── */
+    .page-hero {
+      padding: 40px 40px 28px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .page-hero p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .filter-chip {
+      font-size: 0.78rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 400;
+      color: var(--muted);
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 5px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-chip:hover, .filter-chip.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* ── Product grid ── */
+    .grid-wrap {
+      padding: 32px 40px 64px;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    /* ── Product card ── */
+    .product-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.2s;
+      position: relative;
+    }
+
+    .product-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+    }
+
+    .product-card.in-basket {
+      border-color: #2d6a4f;
+      box-shadow: 0 0 0 2px #2d6a4f22;
+    }
+
+    .card-img {
+      width: 100%;
+      aspect-ratio: 3/3.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .in-basket-badge {
+      display: none;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #2d6a4f;
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 9px;
+      border-radius: 100px;
+    }
+
+    .product-card.in-basket .in-basket-badge { display: block; }
+
+    .card-body {
+      padding: 14px 14px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .card-name {
+      font-size: 0.88rem;
+      font-weight: 500;
+      line-height: 1.3;
+    }
+
+    .card-price {
+      font-size: 0.88rem;
+      font-weight: 500;
+      white-space: nowrap;
+      margin-left: 8px;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .tag {
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
+
+    .colour-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    /* ── Add to basket button (WebMCP tool) ── */
+    .add-btn {
+      width: 100%;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 9px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .add-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .product-card.in-basket .add-btn {
+      background: #eaf4ef;
+      color: #2d6a4f;
+      border-color: #b7d9c8;
+      cursor: default;
+    }
+
+    .add-btn.highlight {
+      animation: btnPulse 1.2s ease-in-out 2;
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    @keyframes btnPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(26,25,23,0.4); }
+      50%  { box-shadow: 0 0 0 6px rgba(26,25,23,0); }
+      100% { box-shadow: 0 0 0 0 rgba(26,25,23,0); }
+    }
+
+    /* ── Basket drawer ── */
+    .basket-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 80;
+      backdrop-filter: blur(2px);
+    }
+    .basket-overlay.open { display: block; }
+
+    .basket-drawer {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: 400px;
+      height: 100vh;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+      transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: -8px 0 40px rgba(0,0,0,0.1);
+    }
+
+    .basket-drawer.open { right: 0; }
+
+    .drawer-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drawer-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+    }
+
+    .close-drawer {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1.4rem;
+      line-height: 1;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .close-drawer:hover { color: var(--text); }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+    }
+
+    .basket-empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-top: 60px;
+    }
+
+    .basket-item {
+      display: flex;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      animation: slideIn 0.25s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .basket-item-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+
+    .basket-item-info { flex: 1; }
+    .basket-item-name { font-size: 0.85rem; font-weight: 500; margin-bottom: 3px; }
+    .basket-item-meta { font-size: 0.75rem; color: var(--muted); }
+    .basket-item-price { font-size: 0.85rem; font-weight: 500; white-space: nowrap; }
+
+    .drawer-footer {
+      padding: 20px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .drawer-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 14px;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 13px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .checkout-btn:hover { opacity: 0.8; }
+
+    /* ── Agent confirmation banner ── */
+    .agent-banner {
+      display: none;
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.14);
+      padding: 18px 24px;
+      z-index: 70;
+      min-width: 440px;
+      max-width: 560px;
+      animation: bannerUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .agent-banner.visible { display: block; }
+
+    @keyframes bannerUp {
+      from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .banner-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .banner-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .banner-text { flex: 1; }
+    .banner-text strong { font-size: 0.88rem; font-weight: 500; display: block; margin-bottom: 3px; }
+    .banner-text p { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+
+    .banner-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .banner-cancel {
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius);
+      padding: 8px 18px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .banner-cancel:hover { background: var(--border); }
+
+    .banner-confirm {
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 8px 18px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .banner-confirm:hover { opacity: 0.8; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .product-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); }
+      header { padding: 0 20px; }
+      .page-hero { padding: 28px 20px 20px; flex-direction: column; align-items: flex-start; gap: 14px; }
+      .grid-wrap { padding: 24px 20px 48px; }
+      .agent-banner { min-width: calc(100vw - 32px); }
+      .basket-drawer { width: 100vw; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <a class="logo" href="#">Thread</a>
+    <nav>
+      <a href="#">New In</a>
+      <a href="#" class="active">T-Shirts</a>
+      <a href="#">Knitwear</a>
+      <a href="#">Sale</a>
+    </nav>
+    <button class="basket-btn" onclick="toggleBasket()">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+        <path d="M1 1h2l2 7h7l1-5H4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="6" cy="12.5" r="1" fill="currentColor"/>
+        <circle cx="11" cy="12.5" r="1" fill="currentColor"/>
+      </svg>
+      Basket
+      <span class="basket-count" id="basketCount">0</span>
+    </button>
+  </header>
+
+  <!-- Page hero -->
+  <div class="page-hero">
+    <div>
+      <h1>T-Shirts</h1>
+      <p id="productCount">12 products</p>
+    </div>
+    <div class="filter-row">
+      <button class="filter-chip active" onclick="filterProducts('all', this)">All</button>
+      <button class="filter-chip" onclick="filterProducts('crew neck', this)">Crew Neck</button>
+      <button class="filter-chip" onclick="filterProducts('v-neck', this)">V-Neck</button>
+      <button class="filter-chip" onclick="filterProducts('oversized', this)">Oversized</button>
+    </div>
+  </div>
+
+  <!-- Product grid -->
+  <div class="grid-wrap">
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+
+  <!-- Basket overlay + drawer -->
+  <div class="basket-overlay" id="basketOverlay" onclick="toggleBasket()"></div>
+  <div class="basket-drawer" id="basketDrawer">
+    <div class="drawer-header">
+      <h2>Your Basket</h2>
+      <button class="close-drawer" onclick="toggleBasket()">×</button>
+    </div>
+    <div class="drawer-body" id="drawerBody">
+      <p class="basket-empty">Your basket is empty.</p>
+    </div>
+    <div class="drawer-footer">
+      <div class="drawer-total">
+        <span>Total</span>
+        <span id="drawerTotal">£0.00</span>
+      </div>
+      <button class="checkout-btn">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- Agent confirmation banner -->
+  <div class="agent-banner" id="agentBanner">
+    <div class="banner-top">
+      <div class="banner-icon">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="6" stroke="#1c1b18" stroke-width="1.4"/>
+          <path d="M7 4v3.5l2 1.5" stroke="#1c1b18" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="banner-text">
+        <strong id="bannerTitle">Agent found matching products</strong>
+        <p id="bannerDesc">Ready to add items to your basket.</p>
+      </div>
+    </div>
+    <div class="banner-actions">
+      <button class="banner-cancel" onclick="cancelAgentAction()">Cancel</button>
+      <button class="banner-confirm" onclick="confirmAgentAction()">Add to basket</button>
+    </div>
+  </div>
+
+  <script>
+    // ── Product data ──
+    const PRODUCTS = [
+      { id: 1,  name: "Essential Crew",       colour: "White",       colourHex: "#f5f5f5", style: "crew neck",  size: "S–XL", price: 28, emoji: "👕" },
+      { id: 2,  name: "Essential Crew",       colour: "Black",       colourHex: "#1a1a1a", style: "crew neck",  size: "S–XL", price: 28, emoji: "👕" },
+      { id: 3,  name: "Essential Crew",       colour: "Red",         colourHex: "#c0392b", style: "crew neck",  size: "S–XL", price: 28, emoji: "👕" },
+      { id: 4,  name: "Classic V-Neck",       colour: "Navy",        colourHex: "#1a2e4a", style: "v-neck",     size: "S–XL", price: 32, emoji: "👕" },
+      { id: 5,  name: "Classic V-Neck",       colour: "White",       colourHex: "#f5f5f5", style: "v-neck",     size: "S–XL", price: 32, emoji: "👕" },
+      { id: 6,  name: "Classic V-Neck",       colour: "Red",         colourHex: "#c0392b", style: "v-neck",     size: "S–XL", price: 32, emoji: "👕" },
+      { id: 7,  name: "Relaxed Oversized",    colour: "Stone",       colourHex: "#c8b9a1", style: "oversized",  size: "S–XL", price: 36, emoji: "👕" },
+      { id: 8,  name: "Relaxed Oversized",    colour: "Slate Grey",  colourHex: "#7a8590", style: "oversized",  size: "S–XL", price: 36, emoji: "👕" },
+      { id: 9,  name: "Relaxed Oversized",    colour: "Red",         colourHex: "#c0392b", style: "oversized",  size: "S–XL", price: 36, emoji: "👕" },
+      { id: 10, name: "Slim Crew",            colour: "Forest Green",colourHex: "#2d6a4f", style: "crew neck",  size: "S–XL", price: 30, emoji: "👕" },
+      { id: 11, name: "Slim Crew",            colour: "Dusty Pink",  colourHex: "#e8b4b8", style: "crew neck",  size: "S–XL", price: 30, emoji: "👕" },
+      { id: 12, name: "Longline V-Neck",      colour: "Charcoal",    colourHex: "#3d3d3d", style: "v-neck",     size: "S–XL", price: 34, emoji: "👕" },
+    ];
+
+    let basket = [];
+    let pendingItems = [];
+    let currentFilter = 'all';
+
+    // ── Render grid ──
+    function renderGrid(filter = 'all') {
+      const grid = document.getElementById('productGrid');
+      const filtered = filter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.style === filter);
+      document.getElementById('productCount').textContent = `${filtered.length} product${filtered.length !== 1 ? 's' : ''}`;
+
+      grid.innerHTML = filtered.map(p => {
+        const inBasket = basket.some(b => b.id === p.id);
+        return `
+        <div class="product-card ${inBasket ? 'in-basket' : ''}" id="card-${p.id}"
+          data-id="${p.id}"
+          data-name="${p.name}"
+          data-colour="${p.colour}"
+          data-style="${p.style}"
+          data-price="${p.price}"
+          data-size="${p.size}"
+        >
+          <div class="card-img" style="background:${p.colourHex}18;">
+            <span>${p.emoji}</span>
+            <span class="in-basket-badge">In basket</span>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="card-name">${p.name}</span>
+              <span class="card-price">£${p.price}.00</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag">
+                <span class="colour-dot" style="background:${p.colourHex};"></span>${p.colour}
+              </span>
+              <span class="tag">${p.style}</span>
+              <span class="tag">${p.size}</span>
+            </div>
+
+            <!--
+              WebMCP tool: add_to_basket
+              Each "Add to basket" button is its own tool instance.
+              toolname:        machine-readable action identifier
+              tooldescription: describes this specific product so the agent can
+                               match it against the user's stated preferences
+                               before deciding whether to add it
+            -->
+            <button
+              class="add-btn ${inBasket ? '' : ''}"
+              id="addbtn-${p.id}"
+              toolname="add_to_basket"
+              tooldescription="Add the ${p.colour} ${p.name} (${p.style}, sizes ${p.size}, £${p.price}.00) to the basket. Only use this tool if this product matches the user's preferences."
+              onclick="handleAddBtn(${p.id})"
+              ${inBasket ? 'disabled' : ''}
+            >${inBasket ? '✓ In basket' : 'Add to basket'}</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // ── Filter ──
+    function filterProducts(filter, el) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      renderGrid(filter);
+    }
+
+    // ── Add to basket (human click) ──
+    function handleAddBtn(id) {
+      const product = PRODUCTS.find(p => p.id === id);
+      if (!product || basket.some(b => b.id === id)) return;
+      addToBasket([product]);
+    }
+
+    // ── Add to basket (confirmed) ──
+    function addToBasket(items) {
+      items.forEach(p => {
+        if (!basket.some(b => b.id === p.id)) basket.push(p);
+      });
+      updateBasketUI();
+      renderGrid(currentFilter);
+    }
+
+    // ── Update basket UI ──
+    function updateBasketUI() {
+      const count = basket.length;
+      const countEl = document.getElementById('basketCount');
+      countEl.textContent = count;
+      countEl.classList.remove('bump');
+      void countEl.offsetWidth;
+      countEl.classList.add('bump');
+
+      const body = document.getElementById('drawerBody');
+      if (count === 0) {
+        body.innerHTML = '<p class="basket-empty">Your basket is empty.</p>';
+      } else {
+        body.innerHTML = basket.map(p => `
+          <div class="basket-item">
+            <div class="basket-item-icon" style="background:${p.colourHex}18;">${p.emoji}</div>
+            <div class="basket-item-info">
+              <div class="basket-item-name">${p.name}</div>
+              <div class="basket-item-meta">${p.colour} · ${p.style} · ${p.size}</div>
+            </div>
+            <div class="basket-item-price">£${p.price}.00</div>
+          </div>`).join('');
+      }
+
+      const total = basket.reduce((sum, p) => sum + p.price, 0);
+      document.getElementById('drawerTotal').textContent = `£${total}.00`;
+    }
+
+    // ── Basket drawer ──
+    function toggleBasket() {
+      document.getElementById('basketDrawer').classList.toggle('open');
+      document.getElementById('basketOverlay').classList.toggle('open');
+    }
+
+    // ──────────────────────────────────────────────
+    // WebMCP agent confirmation flow
+    // When the agent calls add_to_basket tools, we
+    // intercept, collect the pending items, show the
+    // confirmation banner, then commit or cancel.
+    // ──────────────────────────────────────────────
+
+    // Intercept add-btn clicks that come from the agent
+    // (We detect agent-driven clicks via a MutationObserver
+    //  watching for the 'highlight' class the agent triggers,
+    //  OR by the agent directly firing click events)
+
+    // Queue agent-triggered additions here
+    let agentQueue = [];
+    let agentConfirmPending = false;
+
+    function agentRequestAdd(ids) {
+      // Called by the agent detection logic below
+      agentQueue = ids.map(id => PRODUCTS.find(p => p.id === id)).filter(Boolean);
+      if (agentQueue.length === 0) return;
+
+      // Highlight the relevant buttons
+      agentQueue.forEach(p => {
+        const btn = document.getElementById(`addbtn-${p.id}`);
+        if (btn) {
+          btn.classList.add('highlight');
+          // Scroll first highlighted item into view
+          btn.closest('.product-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+
+      // Show confirmation banner
+      const names = agentQueue.map(p => `${p.colour} ${p.name}`);
+      const listStr = names.length === 1
+        ? names[0]
+        : names.slice(0,-1).join(', ') + ' & ' + names[names.length-1];
+
+      document.getElementById('bannerTitle').textContent =
+        `Agent found ${agentQueue.length} matching product${agentQueue.length > 1 ? 's' : ''}`;
+      document.getElementById('bannerDesc').textContent =
+        `Ready to add: ${listStr}. Please review and confirm.`;
+
+      document.getElementById('agentBanner').classList.add('visible');
+      agentConfirmPending = true;
+    }
+
+    function confirmAgentAction() {
+      addToBasket(agentQueue);
+      document.getElementById('agentBanner').classList.remove('visible');
+      agentQueue.forEach(p => {
+        const btn = document.getElementById(`addbtn-${p.id}`);
+        if (btn) btn.classList.remove('highlight');
+      });
+      agentQueue = [];
+      agentConfirmPending = false;
+      // Open basket so user can see what was added
+      document.getElementById('basketDrawer').classList.add('open');
+      document.getElementById('basketOverlay').classList.add('open');
+    }
+
+    function cancelAgentAction() {
+      document.getElementById('agentBanner').classList.remove('visible');
+      agentQueue.forEach(p => {
+        const btn = document.getElementById(`addbtn-${p.id}`);
+        if (btn) btn.classList.remove('highlight');
+      });
+      agentQueue = [];
+      agentConfirmPending = false;
+    }
+
+    // ── MutationObserver: detect when agent highlights buttons ──
+    // The WebMCP agent will fire click events on add-btn elements.
+    // We override the default onclick for agent-triggered clicks by
+    // watching for rapid sequential programmatic clicks (>1 in 800ms)
+    // which indicates agent behaviour vs single human clicks.
+
+    let recentClicks = [];
+
+    document.addEventListener('click', function(e) {
+      const btn = e.target.closest('.add-btn');
+      if (!btn) return;
+
+      const id = parseInt(btn.closest('.product-card').dataset.id);
+      const now = Date.now();
+      recentClicks.push({ id, time: now });
+
+      // Clean up clicks older than 1.5s
+      recentClicks = recentClicks.filter(c => now - c.time < 1500);
+
+      // If 2+ different product add-btns clicked within 1.5s → likely agent
+      const uniqueIds = [...new Set(recentClicks.map(c => c.id))];
+      if (uniqueIds.length >= 2 && !agentConfirmPending) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        agentRequestAdd(uniqueIds);
+        recentClicks = [];
+        return;
+      }
+
+      // Single click: treat as human, add directly
+      if (uniqueIds.length === 1 && recentClicks.length === 1) {
+        handleAddBtn(id);
+      }
+    }, true);
+
+    // ── Init ──
+    renderGrid();
+  </script>
+</body>
+</html>
