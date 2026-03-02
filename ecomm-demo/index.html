@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shop T-Shirts</title>
+  <title>A Great Company | T-Shirts</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
@@ -704,7 +704,7 @@
 </div>
 
 <footer>
-  &copy; 2026 A Great Company Inc · <a href="#" style="color:inherit;">Privacy</a> · <a href="#" style="color:inherit;">Terms</a>
+  &copy; 2025 A Great Company Studio · <a href="#" style="color:inherit;">Privacy</a> · <a href="#" style="color:inherit;">Terms</a>
 </footer>
 
 <script>
@@ -935,6 +935,12 @@
       'Example: "3,7" to add product IDs 3 and 7.'
     );
     form.appendChild(input);
+
+    const submit = document.createElement('button');
+    submit.type = 'submit';
+    submit.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;';
+    submit.textContent = 'Add to basket';
+    form.appendChild(submit);
 
     // On agent submit, trigger the confirmation flow
     form.addEventListener('submit', function(e) {
